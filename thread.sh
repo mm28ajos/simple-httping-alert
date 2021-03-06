@@ -63,23 +63,22 @@ do
   fi
   countping=$(echo $result | grep '100.00% failed' | wc -l)
   countdns=$(echo $result | grep 'No valid IPv4 or IPv6 address found for' | wc -l)
-
   # check if ping was successful
-  if [[ "$countping" = 1 ]] | [[ "$countdns" = 1 ]]; then
+  if [[ "$countping" = 1 ]] || [[ "$countdns" = 1 ]]; then
     # send mail on failure
     if [[ "$CHECK_IPv6" = true ]]; then
       if [[ "$countping" = 1 ]]; then
-        printf "Subject: Httping on IPv6 failed for $myHost\nHost $myHost is down on IPv6 (http ping failed) at $(date)" | msmtp -a default $EMAIL_ADDRESS
+        printf "Subject: Httping on IPv6 failed for $myHost\nResource $myHost is down on IPv6 (http ping failed) at $(date)" | msmtp -a default $EMAIL_ADDRESS
       fi
       if [[ "$countdns" = 1 ]]; then
-        printf "Subject: DNS on IPv6 failed for $myHost\nHost $myHost is down on IPv6 (DNS failed) at $(date)" | msmtp -a default $EMAIL_ADDRESS
+        printf "Subject: DNS on IPv6 failed for $myHost\nResource $myHost is down on IPv6 (DNS failed) at $(date)" | msmtp -a default $EMAIL_ADDRESS
       fi
     else
       if [[ "$countping" = 1 ]]; then
-        printf "Subject: Httping on IPv4 failed for $myHost\nHost $myHost is down on IPv6 (http ping failed) at $(date)" | msmtp -a default $EMAIL_ADDRESS
+        printf "Subject: Httping on IPv4 failed for $myHost\nResource $myHost is down on IPv6 (http ping failed) at $(date)" | msmtp -a default $EMAIL_ADDRESS
       fi
       if [[ "$countdns" = 1 ]]; then
-        printf "Subject: DNS on IPv4 failed for $myHost\nHost $myHost is down on IPv6 (DNS failed) at $(date)" | msmtp -a default $EMAIL_ADDRESS
+        printf "Subject: DNS on IPv4 failed for $myHost\nResource $myHost is down on IPv6 (DNS failed) at $(date)" | msmtp -a default $EMAIL_ADDRESS
       fi
     fi
     # increase sleep time by factor 2
