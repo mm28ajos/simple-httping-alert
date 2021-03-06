@@ -1,0 +1,24 @@
+version: '2.2'
+services:
+  simple-httping-alert:
+    image: mm28ajos/simple-httping-alert:latest
+    restart: unless-stopped
+    # network_mode host is used to have ipv6 accessibility from host. May differ for your IPv6 handling in docker.
+    network_mode: host
+    volumes:
+      - /path/to/setting/settings.conf:/opt/simplehttpingalert/settings.conf
+    environment:
+      - TZ=Europe/Berlin
+      - URLS=host.tld host2.tld.de
+      - COUNT=2
+      - EMAIL_ADDRESS=mail@domain.tld
+      - SLEEP_SEC=5
+      - CHECK_IPv4=true
+      - CHECK_IPv6=true
+      - MAIL_HOST=mailhost.tld
+      - MAIL_PORT=465
+      - MAIL_DOMAIN=maildomain.tld
+      - MAIL_MAILDOMAIN=maildomain.tld
+      - MAIL_USER=username
+      - MAIL_PASSWORD=password
+      - MAIL_FROM=user@domain.tld
