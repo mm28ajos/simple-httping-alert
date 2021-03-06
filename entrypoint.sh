@@ -63,8 +63,8 @@ else
 fi
 
 # check if setting is missing (non-mail)
-if [[ -z "${HOSTS}" ]]; then
-  echo "HOSTS missing!"
+if [[ -z "${URLS}" ]]; then
+  echo "URLS missing!"
   exit 1
 fi
 
@@ -99,7 +99,7 @@ fi
 ##########################################################
 
 # start thread for each host to monitor
-for myHost in $HOSTS
+for myHost in $URLS
 do
   if [[ "$CHECK_IPv4" = true ]]; then
     bash ./thread.sh -h $myHost -e $EMAIL_ADDRESS -s $SLEEP_SEC -c $COUNT &
