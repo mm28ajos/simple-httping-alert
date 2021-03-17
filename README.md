@@ -22,7 +22,7 @@ Body: Resource https://domain.tld/resource is down on IPv6 (DNS failed) at Sat M
 Mail on GET failure IPv4
 ```
 Subject: Httping on IPv4 failed for https://domain.tld/resource
-Body: Resource https://domain.tld/resource is down on IPv6 (http ping failed) at Sat Mar  6 16:30:13 CET 2021
+Body: Resource https://domain.tld/resource is down on IPv4 (http ping failed) at Sat Mar  6 16:30:13 CET 2021
 ```
 
 ## Getting started
