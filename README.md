@@ -7,6 +7,7 @@ Basically, a simple wrapper script around httping, refer to https://www.vanheusd
 * check IPv4 and/or IPv6 availability
 * check if a DNS A/AAAA record is present for the host of the http-resource
 * get an e-mail notification on failure (DNS or GET request)
+* recognize own connection availability by ping
 * specify how many httpings should be carried out in a check interval
 * specifiy the recheck interval in seconds
 * automatic slow down of rechecks if resource is down to avoid mail flood (maximum recheck slow down to two hours if resource is down)

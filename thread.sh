@@ -55,42 +55,54 @@ SLEEP_SEC_INITAL=$SLEEP_SEC
 # loop until forever
 while true
 do
-  # ping host on ipv6 or ipv4
+  # check if own connection is up (ping google DNS)
   if [[ "$CHECK_IPv6" = true ]]; then
-    result=$(httping -6 -c $COUNT -s -o 200 -G -l -g $myHost )
+    result=$(ping -6 -c 1 2001:4860:4860::8888 )
   else
-    result=$(httping -c $COUNT -s -o 200 -G -l -g $myHost )
+    result=$(ping -c 1 8.8.8.8 )
   fi
-  countping=$(echo $result | grep '100.00% failed' | wc -l)
-  countdns=$(echo $result | grep 'No valid IPv4 or IPv6 address found for' | wc -l)
-  # check if ping was successful
-  if [[ "$countping" = 1 ]] || [[ "$countdns" = 1 ]]; then
-    # send mail on failure
+  countping=$(echo $result | grep '100% packet loss' | wc -l)
+
+  if [[ "$countping" = 0 ]]; then
+    # ping host on ipv6 or ipv4
     if [[ "$CHECK_IPv6" = true ]]; then
-      if [[ "$countping" = 1 ]]; then
-        printf "Subject: Httping on IPv6 failed for $myHost\nResource $myHost is down on IPv6 (http ping failed) at $(date)" | msmtp -a default $EMAIL_ADDRESS
+      result=$(httping -6 -c $COUNT -s -o 200 -G -l -g $myHost )
+    else
+      result=$(httping -c $COUNT -s -o 200 -G -l -g $myHost )
+    fi
+    countping=$(echo $result | grep '100.00% failed' | wc -l)
+    countdns=$(echo $result | grep 'No valid IPv4 or IPv6 address found for' | wc -l)
+
+    # check if http ping of resource is successful
+    if [[ "$countping" = 1 ]] || [[ "$countdns" = 1 ]]; then
+      # send mail on failure
+      if [[ "$CHECK_IPv6" = true ]]; then
+        if [[ "$countping" = 1 ]]; then
+          printf "Subject: Httping on IPv6 failed for $myHost\nResource $myHost is down on IPv6 (http ping failed) at $(date)" | msmtp -a default $EMAIL_ADDRESS
+        fi
+        if [[ "$countdns" = 1 ]]; then
+          printf "Subject: DNS on IPv6 failed for $myHost\nResource $myHost is down on IPv6 (DNS failed) at $(date)" | msmtp -a default $EMAIL_ADDRESS
+        fi
+      else
+        if [[ "$countping" = 1 ]]; then
+          printf "Subject: Httping on IPv4 failed for $myHost\nResource $myHost is down on IPv6 (http ping failed) at $(date)" | msmtp -a default $EMAIL_ADDRESS
+        fi
+        if [[ "$countdns" = 1 ]]; then
+          printf "Subject: DNS on IPv4 failed for $myHost\nResource $myHost is down on IPv6 (DNS failed) at $(date)" | msmtp -a default $EMAIL_ADDRESS
+        fi
       fi
-      if [[ "$countdns" = 1 ]]; then
-        printf "Subject: DNS on IPv6 failed for $myHost\nResource $myHost is down on IPv6 (DNS failed) at $(date)" | msmtp -a default $EMAIL_ADDRESS
+      # increase sleep time by factor 2
+      SLEEP_SEC=$(( 2*SLEEP_SEC ))
+      # wait maximum 2h until the next try
+      if ((SLEEP_SEC>=7200)); then
+        SLEEP_SEC=7200
       fi
     else
-      if [[ "$countping" = 1 ]]; then
-        printf "Subject: Httping on IPv4 failed for $myHost\nResource $myHost is down on IPv6 (http ping failed) at $(date)" | msmtp -a default $EMAIL_ADDRESS
-      fi
-      if [[ "$countdns" = 1 ]]; then
-        printf "Subject: DNS on IPv4 failed for $myHost\nResource $myHost is down on IPv6 (DNS failed) at $(date)" | msmtp -a default $EMAIL_ADDRESS
-      fi
+      # reset sleep sec to inital value if ping was succesful
+      SLEEP_SEC=$SLEEP_SEC_INITAL
     fi
-    # increase sleep time by factor 2
-    SLEEP_SEC=$(( 2*SLEEP_SEC ))
-    # wait maximum 2h until the next try
-    if ((SLEEP_SEC>=7200)); then
-      SLEEP_SEC=7200
-    fi
-  else
-    # reset sleep sec to inital value if ping was succesful
-    SLEEP_SEC=$SLEEP_SEC_INITAL
   fi
+  
   # sleep before recheck
   sleep $SLEEP_SEC
 done
