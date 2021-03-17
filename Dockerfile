@@ -7,7 +7,7 @@ ENV THREAD=${APP_HOME}thread.sh
 WORKDIR $APP_HOME
 
 # install mail, tzdata and httping
-RUN apt update && apt install tzdata msmtp httping -y 
+RUN apt update && apt install tzdata msmtp httping iputils-ping -y
 
 # copy files
 COPY entrypoint.sh thread.sh ./
